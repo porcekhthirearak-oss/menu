@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ตัวอย่าง: ระบบจัดการร้าน โรงอาหารพรีออเดอร์</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff3ea;--surf:#fffaf6;--ink:#4a2c36;--mut:#8a6a74;--line:#f0d3d6;--chili:#c9506f;--green:#c9506f;--tint:#fde4e9;--warn:#fff0d2;--btn:#c9506f;--ongreen:#ffffff;--onbtn:#ffffff;--ok:#2f8f5b;--danger:#c0392b;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="light"]){--bg:#fff3ea;--surf:#fffaf6;--ink:#4a2c36;--mut:#8a6a74;--line:#f0d3d6;--chili:#c9506f;--green:#c9506f;--tint:#fde4e9;--warn:#fff0d2;--btn:#c9506f;--ongreen:#ffffff;--onbtn:#ffffff;--ok:#2f8f5b;--danger:#c0392b;color-scheme:light}}
+:root[data-theme="light"]{--bg:#fff3ea;--surf:#fffaf6;--ink:#4a2c36;--mut:#8a6a74;--line:#f0d3d6;--chili:#c9506f;--green:#c9506f;--tint:#fde4e9;--warn:#fff0d2;--btn:#c9506f;--ongreen:#ffffff;--onbtn:#ffffff;--ok:#2f8f5b;--danger:#c0392b;color-scheme:light}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Sarabun,sans-serif}
+h1,h2,h3,.pr{font-family:Prompt,Sarabun,sans-serif;margin:0}h2{margin:14px 0 6px;font-size:20px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+header h1{font-size:clamp(28px,6vw,42px);line-height:1.2}header p{color:var(--mut);margin:6px 0 0;max-width:60ch}
+nav{display:flex;gap:6px;margin:16px 0;border-bottom:2px solid var(--line);overflow-x:auto}
+nav button{font:600 15px Prompt,sans-serif;background:none;border:0;color:var(--mut);padding:10px 14px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+nav button[aria-selected=true]{color:var(--chili);border-color:var(--chili)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:480px}
+.slot{background:var(--surf);border:2px solid var(--line);border-radius:10px;padding:10px;text-align:left;cursor:pointer;color:var(--ink);font:inherit}
+.slot b{font:700 22px Prompt,sans-serif;display:block}.slot small{color:var(--mut)}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}
+.slot:disabled{opacity:.45;cursor:not-allowed}.slot[aria-pressed=true]{border-color:var(--chili);background:var(--warn)}
+.layout{display:grid;gap:20px}@media(min-width:800px){.layout{grid-template-columns:1fr 340px;align-items:start}}
+.sh{display:flex;align-items:baseline;gap:8px;margin:18px 0 8px;flex-wrap:wrap}.sh small{color:var(--mut)}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.item{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column}
+.ic{display:inline-block;width:72px;height:72px;line-height:0}.ic.sm{width:26px;height:26px;vertical-align:middle}.ic svg{width:100%;height:100%;overflow:visible}
+.ic *{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.ic .w{fill:#ffffff}.ic .p{fill:#ff9fb5}.ic .y{fill:#ffd45e}.ic .g{fill:#8fd694}.ic .b{fill:#f0a35e}.ic .r{fill:#ff5a5f}.ic .t{stroke-width:1.8}.ic .e{fill:var(--ink);stroke:none}.ic .k{fill:#ff7f9f;stroke:none;opacity:.75}.ic svg{filter:drop-shadow(0 2px 0 rgba(74,44,54,.18))}
+.item .e{font-size:0;line-height:1}.item .row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px}
+.btn{font:600 15px Prompt,sans-serif;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;background:var(--btn);color:var(--onbtn)}
+.btn.sec{background:var(--tint);color:var(--ink)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.chip{border:1.5px solid var(--line);background:var(--surf);color:var(--ink);border-radius:20px;padding:3px 14px;font:inherit;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--green);color:var(--ongreen);border-color:var(--green)}
+.cart{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:16px;position:sticky;top:12px}
+.line{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.line .q button{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);background:var(--surf);color:var(--ink);cursor:pointer}
+.tot{display:flex;justify-content:space-between;font:700 20px Prompt,sans-serif;margin:12px 0}
+label{display:block;font-weight:600;margin-top:10px;font-size:14px}
+input,select{width:100%;padding:9px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.hint{color:var(--mut);font-size:14px}.err{color:var(--danger);font-size:14px;min-height:20px}
+.qr{margin:8px 0;padding:10px;border:1.5px dashed var(--green);border-radius:8px;text-align:center;background:var(--tint)}
+.ticket{background:var(--surf);border:1px solid var(--line);border-left:6px solid var(--green);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.ticket.mine{border-left-color:var(--chili)}
+.code{font:700 36px Prompt,sans-serif;color:var(--chili);line-height:1}
+.st{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}.st span{font-size:12px;padding:2px 8px;border-radius:12px;background:var(--line);color:var(--mut)}.st span.on{background:var(--green);color:var(--ongreen)}
+.pay{display:inline-block;font-size:13px;font-weight:600;padding:1px 10px;border-radius:12px}.pay.y{background:var(--tint);color:var(--green)}.pay.n{background:var(--warn);color:var(--chili)}
+.board{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.bc{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:14px}
+.bc .q{display:flex;gap:6px;flex-wrap:wrap;min-height:34px}.bc .q b{background:var(--green);color:#fff;border-radius:8px;padding:0 10px;font-family:Prompt}.bc .q b.me{outline:3px solid var(--chili)}
+.bc .q b.w{background:var(--line);color:var(--ink)}
+.empty{padding:26px;text-align:center;color:var(--mut);background:var(--surf);border:1px dashed var(--line);border-radius:10px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:24px;opacity:0;pointer-events:none;transition:opacity .2s}.toast.show{opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.pay{display:inline-block;font-size:13px;font-weight:600;padding:1px 10px;border-radius:12px}.pay.ok{background:var(--tint);color:var(--ok)}.pay.no{background:var(--warn);color:var(--danger)}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.bc{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:14px}.bc h3{margin-bottom:8px}.bc .g{margin:8px 0}.bc .g small{display:block;color:var(--mut)}
+.q{display:inline-block;font:700 18px Prompt,sans-serif;padding:0 10px;margin:2px 4px 2px 0;border-radius:8px;background:var(--tint)}.q.me{background:var(--btn);color:var(--onbtn)}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}.seg button{border:0;background:var(--surf);color:var(--ink);font:inherit;padding:2px 10px;cursor:pointer}.seg button[aria-pressed=true]{background:var(--green);color:var(--ongreen)}
+.sd{margin:2px 0 10px;color:var(--mut);font-size:15px}
+.ed{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.ed input:not([type=checkbox]),.ed select{width:auto}.ed input[type=checkbox]{width:auto}
+.btn.del{color:var(--danger)}.warn{background:var(--warn);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:14px}
+.bc.off{opacity:.65}.item.off{opacity:.55}.search{margin:10px 0}.search input{max-width:440px}
+</style></head><body>
+<div class="wrap">
+<div class="warn" style="margin-top:0"><b>หน้าตัวอย่าง</b> ข้อมูลเป็นของจำลอง รีเฟรชแล้วรีเซ็ต · <b>ลูกค้า:</b> แท็บ “สั่งอาหาร” → เลือก “ร้านโดนเส้น” แล้วลองพิมพ์ค้นหา เช่น กุ้ง เห็ด หมู (กุ้งกับหมึกบั้งตั้งเป็นของหมดไว้ให้ดู) · <b>ร้านค้า:</b> แท็บ “แอดมิน” → ร้านโดนเส้น รหัส 2222 → “เมนูและราคา” → กด “ของหมด” แล้วกลับไปดูฝั่งลูกค้า · ลงทะเบียนร้านใหม่ใช้รหัสเชิญ <b>demo</b></div>
+<header><h1>สั่งก่อน ไม่ต้องรอคิว</h1><p id="hd">เลือกเมนูจากร้านในโรงอาหาร เลือกรอบรับ แล้วรับบัตรคิวของแต่ละร้าน</p></header>
+<nav role="tablist">
+<button role="tab" data-v="order">สั่งอาหาร</button>
+<button role="tab" data-v="mine">บัตรคิวของฉัน <span id="cnt"></span></button>
+<button role="tab" data-v="board">ดูคิวรายร้าน</button>
+<button role="tab" data-v="admin">แอดมิน</button>
+</nav>
+<main id="app"></main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+/* ตัวจำลองหลังบ้านสำหรับหน้าตัวอย่าง: ข้อมูลอยู่ในหน่วยความจำ รีเฟรชแล้วรีเซ็ต */
+(()=>{
+const INVITE="demo",E=(m,c)=>{const e=new Error(m);e.code=c||400;return e};
+const D={stalls:[{id:1,name:"ร้านก๋วยเตี๋ยว",letter:"ก",description:"เลือกน้ำซุป เส้น เนื้อสัตว์ และใส่หรือไม่ใส่ผัก",pw:"1111"},{id:2,name:"ร้านโดนเส้น",letter:"ด",description:"เส้นหลากหลายตามชื่อร้าน เช่น มาม่า วุ้นเส้น เส้นอุด้ง",pw:"2222"},{id:3,name:"ร้านอาหารตามสั่ง",letter:"ต",description:"ราดข้าว 1 จานเลือกกับข้าวได้ 2 อย่าง เลือกข้าวหรือขนมจีน",pw:"3333"}],items:[],slots:[{id:1,time:"11:30"},{id:2,time:"12:00"},{id:3,time:"12:30"}],ss:[],tickets:[],nid:1};
+const add=(s,n,p,k,i)=>D.items.push({id:D.nid++,stall_id:s,name:n,price:p,kind:k||"normal",icon:i||"",available:true});
+[["มาม่า",10],["วุ้นเส้น",10],["เส้นอุด้ง",10],["เส้นหมี่ขาว",10],["เต้าหู้ไข่",10],["มาม่าเกาหลี",15],["ไก่",10],["ลูกชิ้น",10],["ไส้กรอก",10]].forEach(r=>add(2,r[0],r[1]));
+[["ผักบุ้ง", "veg"], ["ผักกาดขาว", "veg"], ["ข้าวโพดอ่อน", "veg"], ["เห็ดออรินจิ", "veg"], ["เห็ดเข็มทอง", "veg"], ["กะหล่ำปี", "veg"], ["ต็อก", "tteok"], ["หมูสามชั้น", "pork3"], ["หมูสไลด์", "slice"], ["เต้าหู้ทอด", "ftofu"], ["สาหร่ายวากาเมะ", "wakame"], ["เต้าหู้ชีส", "tofu"], ["ไข่นกกระทา", "quail"], ["ปูอัด", "balls"], ["แฮมสเต็ก", "meat"], ["เบค่อนพันไส้กรอก", "sausage"], ["กุ้งพันสาหร่าย", "wakame"], ["เต้าหู้ปลา", "balls"], ["นารูโตะ", "balls"], ["หมูเด้ง", "balls"], ["เบค่อนพันเห็ด", "sausage"], ["ชิกูวะ", "balls"], ["ไก่พันสาหร่าย", "chicken"], ["หมึกกรอบ", "meat"], ["แมงกระพรุน", "thin"], ["ฟองเต้าหู้", "tofu"], ["หมึกบั้ง", "meat"], ["กุ้ง", "meat"], ["ทูโทนชิชาโมะ", "meat"]].forEach(r=>{if(!D.items.some(i=>i.stall_id==2&&i.name==r[0]))add(2,r[0],10,"normal",r[1])});
+D.items.filter(i=>i.stall_id==2&&["กุ้ง","หมึกบั้ง"].includes(i.name)).forEach(i=>i.available=false);
+add(2,"น้ำหม่าล่า",0,"broth");add(2,"น้ำดำ",0,"broth");
+[["ก๋วยเตี๋ยวน้ำใส",40],["ก๋วยเตี๋ยวเย็นตาโฟ",40],["ก๋วยเตี๋ยวต้มยำ",45],["ก๋วยเตี๋ยวน้ำตก",45]].forEach(r=>add(1,r[0],r[1],"noodle"));
+add(3,"ราดข้าว",30,"plate");["ลาบหมู","ไข่ดาว","แกงเขียวหวานไก่","ผัดกะเพราหมูสับ","ผัดผักรวม","หมูทอดกระเทียม"].forEach(n=>add(3,n,0,"dish"));
+D.stalls.forEach(s=>D.slots.forEach(l=>D.ss.push({stall_id:s.id,slot_id:l.id,cap:10,open:true})));
+let sid=null;const st=id=>D.stalls.find(s=>s.id==id),code=t=>st(t.stall_id).letter+"-"+String(t.n).padStart(3,"0");
+const tout=t=>({id:t.id,code:code(t),stall_name:st(t.stall_id).name,time:D.slots.find(l=>l.id==t.slot_id).time,customer:t.customer,status:t.status,paid:t.paid,total:t.total,lines:t.lines,ahead:D.tickets.filter(x=>x.stall_id==t.stall_id&&x.status<2&&x.n<t.n).length});
+const stallIn=(b,self)=>{const name=String(b.name||"").trim();if(!name||[...name].length>40)throw E("ชื่อร้านต้องมี 1–40 ตัวอักษร");const ch=[...String(b.letter||"").trim()];if(ch.length!==1||!/^[\p{L}\p{N}]$/u.test(ch[0]))throw E("ตัวอักษรบัตรคิวต้องเป็นตัวอักษรหรือตัวเลข 1 ตัว เช่น ก หรือ A");const L=ch[0].toUpperCase();
+ if(D.stalls.some(s=>s.id!==self&&s.name.toLowerCase()==name.toLowerCase()))throw E("มีร้านชื่อนี้อยู่แล้ว");if(D.stalls.some(s=>s.id!==self&&s.letter==L))throw E(`ตัวอักษร “${L}” ถูกใช้โดยร้านอื่นแล้ว เลือกตัวอื่น`);
+ const d=String(b.description||"").trim();if([...d].length>120)throw E("คำอธิบายร้านยาวเกิน 120 ตัวอักษร");return{name,letter:L,description:d}};
+const KINDS=["normal","noodle","plate","dish","broth"];
+const itemIn=(b,o)=>{o=o||{};const name=String(b.name??o.name??"").trim();if(!name||[...name].length>60)throw E("ชื่อเมนูต้องมี 1–60 ตัวอักษร");const kind=b.kind??o.kind??"normal";if(!KINDS.includes(kind))throw E("ประเภทเมนูไม่ถูกต้อง");let price=Number(b.price??o.price);if(!Number.isInteger(price)||price<0||price>1000)throw E("ราคาไม่ถูกต้อง (0–1000)");if(kind=="dish"||kind=="broth")price=0;return{name,kind,price,icon:String(b.icon??o.icon??""),available:!!(b.available??o.available)}};
+const me=()=>{if(!sid)throw E("กรุณาเข้าสู่ระบบ",401);return st(sid)};
+const own=id=>{me();const i=D.items.find(x=>x.id==id&&x.stall_id==sid);if(!i)throw E("ไม่พบเมนูของร้านคุณ",404);return i};
+const dup=(n,self)=>D.items.some(i=>i.stall_id==sid&&i.name==n&&i.id!==self);
+function route(m,p,b,q){let r;
+ if(m=="GET"&&p=="/menu")return{stalls:D.stalls.map(s=>({id:s.id,name:s.name,letter:s.letter,description:s.description,has_pw:true})),items:D.items.map(({id,stall_id,name,price,icon,kind,available})=>({id,stall_id,name,price,icon,kind,available})),invite_required:true};
+ if(m=="GET"&&p=="/slots")return{slots:D.slots,avail:D.ss.map(a=>({...a,used:D.tickets.filter(t=>t.stall_id==a.stall_id&&t.slot_id==a.slot_id).length}))};
+ if(m=="POST"&&p=="/orders"){const by={};b.lines.forEach(l=>{const it=D.items.find(i=>i.id==l.item_id);if(!it||!it.available)throw E("รายการอาหารไม่ถูกต้องหรือหมดแล้ว");(by[it.stall_id]=by[it.stall_id]||[]).push({name:it.name,qty:l.qty,base:l.base||null,detail:l.detail||(l.dishes?l.dishes.map(d=>D.items.find(i=>i.id==d).name).join(" + ")+" · "+l.plate:l.noodle?[l.noodle,l.veg?"ใส่ผัก":"ไม่ใส่ผัก"].join(" · "):null),price:it.price})});
+  return{tickets:Object.entries(by).map(([s,lines])=>{const n=D.tickets.filter(t=>t.stall_id==s).length+1,t={id:D.nid++,token:"t"+D.nid,stall_id:+s,n,slot_id:b.slot_id,customer:b.name,status:0,paid:false,lines,total:lines.reduce((a,l)=>a+l.price*l.qty,0)};D.tickets.push(t);return{token:t.token,code:code(t)}})}}
+ if(m=="GET"&&p=="/tickets"){const k=(q.tokens||"").split(",");return D.tickets.filter(t=>k.includes(t.token)).map(tout)}
+ if(m=="GET"&&p=="/board")return D.stalls.map(s=>({name:s.name,tickets:D.tickets.filter(t=>t.stall_id==s.id&&t.status<3).map(t=>({code:code(t),status:t.status,customer:t.customer}))}));
+ if(m=="POST"&&p=="/stalls"){if(b.invite!==INVITE)throw E("รหัสเชิญไม่ถูกต้อง (ตัวอย่างนี้ใช้รหัส demo)",403);if(String(b.password||"").length<4)throw E("รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร");const f=stallIn(b),s={id:D.nid++,...f,pw:b.password};D.stalls.push(s);D.slots.forEach(l=>D.ss.push({stall_id:s.id,slot_id:l.id,cap:10,open:true}));sid=s.id;return{ok:true,id:s.id}}
+ if(m=="POST"&&p=="/admin/login"){const s=st(b.stall_id);if(!s)throw E("ไม่พบร้านนี้");if(s.pw!==b.password)throw E("รหัสผ่านไม่ถูกต้อง",401);sid=s.id;return{ok:true}}
+ if(m=="POST"&&p=="/admin/logout"){sid=null;return{ok:true}}
+ if(m=="GET"&&p=="/admin/me"){const s=me();return{id:s.id,name:s.name,letter:s.letter,description:s.description}}
+ if(m=="PUT"&&p=="/admin/stall"){const s=me(),f=stallIn(b,s.id);if(f.letter!==s.letter&&D.tickets.some(t=>t.stall_id==s.id))throw E("วันนี้มีบัตรคิวแล้ว เปลี่ยนตัวอักษรบัตรคิวได้ตอนยังไม่มีออเดอร์ของวันนี้");Object.assign(s,f);return{ok:true}}
+ if(m=="POST"&&p=="/admin/password"){me().pw=b.password;return{ok:true}}
+ if(m=="GET"&&p=="/admin/tickets"){me();return D.tickets.filter(t=>t.stall_id==sid).map(tout)}
+ if(r=p.match(/^\/admin\/tickets\/(\d+)\/(advance|pay)$/)){me();const t=D.tickets.find(x=>x.id==r[1]&&x.stall_id==sid);if(r[2]=="pay")t.paid=true;else{if(t.status==2&&!t.paid)throw E("ลูกค้ายังไม่ชำระเงิน กด “รับเงินแล้ว” ก่อนส่งมอบ");t.status++}return{ok:true}}
+ if(m=="GET"&&p=="/admin/items"){me();return D.items.filter(i=>i.stall_id==sid)}
+ if(m=="POST"&&p=="/admin/items"){me();const f=itemIn(b);if(dup(f.name))throw E("มีเมนูชื่อนี้ในร้านแล้ว");const i={id:D.nid++,stall_id:sid,...f};D.items.push(i);return{ok:true,id:i.id}}
+ if(r=p.match(/^\/admin\/items\/(\d+)$/)){const i=own(r[1]);if(m=="DELETE"){D.items.splice(D.items.indexOf(i),1);return{ok:true}}const f=itemIn(b,i);if(dup(f.name,i.id))throw E("มีเมนูชื่อนี้ในร้านแล้ว");Object.assign(i,f);return{ok:true}}
+ if(m=="GET"&&p=="/admin/slots"){me();return D.ss.filter(a=>a.stall_id==sid).map(a=>({slot_id:a.slot_id,time:D.slots.find(l=>l.id==a.slot_id).time,cap:a.cap,open:a.open}))}
+ if(r=p.match(/^\/admin\/slots\/(\d+)$/)){me();const a=D.ss.find(x=>x.stall_id==sid&&x.slot_id==r[1]);a.cap=+b.cap;a.open=!!b.open;return{ok:true}}
+ throw E("ไม่พบ",404)}
+window.fetch=async(url,o)=>{o=o||{};const u=new URL(url,"http://x");try{const d=route(o.method||"GET",u.pathname.replace(/^\/api/,""),o.body?JSON.parse(o.body):{},Object.fromEntries(u.searchParams));return{ok:true,status:200,json:async()=>JSON.parse(JSON.stringify(d))}}catch(e){return{ok:false,status:e.code||500,json:async()=>({error:e.message})}}};
+})();
+</script>
+<script>
+const $=s=>document.querySelector(s),baht=n=>"฿"+n;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ไอคอนการ์ตูน (SVG) แทนอิโมจิ */
+const BOWL='<path class="w" d="M8 31c10-1.5 38-1.5 48 0-1 13-10 22-24 22S9 44 8 31z"/><path d="M23 56h18"/>';
+const NOO='<path d="M15 30c2-10 6-10 8 0s6-10 8 0 6-10 8 0 6-10 8 0"/><path d="M17 24c2-8 5-8 7 0s5-8 7 0"/>';
+const CHOP='<path d="M40 6l12 22M47 5l10 22"/>';
+const CHILI='<path class="r" d="M40 38c7-2 12 2 10 8-1 3-5 3-8 1-3-2-4-7-2-9z"/><path d="M49 40c2-2 4-2 5-4"/>';
+const IC={
+ bowl:BOWL+NOO+CHOP,
+ pork:BOWL+NOO+'<circle class="p" cx="22" cy="22" r="6"/><path class="t" d="M19 22h6"/>'+CHOP,
+ soup:BOWL+'<path class="p" d="M10 33c12 2 32 2 44 0"/><circle class="w" cx="24" cy="26" r="5"/><circle class="w" cx="36" cy="24" r="5"/><path d="M18 14c-2-3 2-4 0-7M30 14c-2-3 2-4 0-7M42 14c-2-3 2-4 0-7"/>',
+ tom:BOWL+NOO+CHILI+'<path d="M14 40c8 2 20 2 28 0" class="t"/>',
+ gyoza:'<path class="y" d="M8 40c0-16 14-22 24-22s24 6 24 22c-14 6-34 6-48 0z"/><path d="M16 36l2-9M24 38l1-12M32 38v-12M40 38l-1-12M48 36l-2-9"/><path d="M20 52h24"/>',
+ packet:'<rect class="y" x="10" y="14" width="44" height="34" rx="6"/><path d="M16 24c3-5 6 5 9 0s6 5 9 0 6 5 9 0M16 33c3-5 6 5 9 0s6 5 9 0 6 5 9 0M16 42c3-5 6 5 9 0s6 5 9 0 6 5 9 0" class="t"/>',
+ packetk:'<rect class="y" x="10" y="14" width="44" height="34" rx="6"/><path d="M16 24c3-5 6 5 9 0s6 5 9 0M16 33c3-5 6 5 9 0s6 5 9 0" class="t"/>'+CHILI.replace('M40 38','M32 36'),
+ thin:BOWL+'<path class="t" d="M14 30c2-12 4-12 6 0M22 30c2-14 4-14 6 0M30 30c2-12 4-12 6 0M38 30c2-14 4-14 6 0M46 30c2-12 4-12 6 0"/>'+CHOP,
+ udon:BOWL+'<path d="M13 30c2-10 5-10 7 0s5-10 7 0 5-10 7 0 5-10 7 0" style="stroke-width:4.2"/>',
+ tofu:'<path class="w" d="M8 34l18-8 20 6-18 9z"/><path class="w" d="M8 34v10l20 9V41M28 41l18-9v10L28 53"/><path class="w" d="M30 22l14-6 14 5-14 7z"/><path class="w" d="M30 22v8l14 6V28M44 28l14-7v8L44 36" />',
+ veg:'<path d="M30 40v14M34 40v14"/><path class="g" d="M32 14c-6-4-14 0-14 7-5 2-6 9 0 11 3 6 12 8 14 4 2 4 11 2 14-4 6-2 5-9 0-11 0-7-8-11-14-7z"/><path class="t" d="M26 28c3 2 6 2 9 0"/>',
+ meat:'<path class="p" d="M10 34c0-12 12-18 24-16 12 2 20 10 18 20-2 10-16 12-28 8-10-3-14-6-14-12z"/><path class="w" d="M22 32c0-5 8-8 14-5 6 3 5 10-2 12-6 2-12 0-12-7z"/>',
+ chicken:'<path class="b" d="M24 12c10-6 26 2 22 16-2 7-10 10-17 8-8-2-13-9-5-24z" transform="rotate(10 32 24)"/><path d="M26 34L14 50"/><circle class="w" cx="11" cy="52" r="4"/><circle class="w" cx="17" cy="55" r="4"/>',
+ balls:'<path d="M10 54L54 10"/><circle class="b" cx="22" cy="42" r="8"/><circle class="b" cx="34" cy="30" r="8"/><circle class="b" cx="46" cy="18" r="8"/>',
+ sausage:'<path class="b" d="M12 44C6 38 6 28 16 20s20-12 28-6 8 16 0 26-24 12-32 4z"/><path class="t" d="M20 36l8 8M28 28l10 10M36 20l8 8"/>',
+ plate:'<ellipse class="w" cx="32" cy="42" rx="26" ry="11"/><path class="w" d="M16 40c0-14 10-20 17-20s15 6 15 20c-9 4-23 4-32 0z"/><path class="t" d="M24 32l2 2M32 28l2 2M38 34l2 2M28 38l2 2"/><circle class="p" cx="46" cy="44" r="4"/><circle class="g" cx="18" cy="45" r="4"/>',
+ nt:BOWL+'<path class="b" d="M10 33c12 2 32 2 44 0"/><path d="M14 30c2-10 5-10 7 0s5-10 7 0 5-10 7 0 5-10 7 0"/><circle class="r" cx="24" cy="25" r="3.5"/><circle class="g" cx="38" cy="24" r="3"/>'+CHOP,
+ tteok:'<rect class="w" x="8" y="14" width="48" height="12" rx="6"/><rect class="w" x="8" y="30" width="48" height="12" rx="6"/><rect class="w" x="8" y="46" width="48" height="12" rx="6"/><path class="t" d="M20 20h6M34 20h8M20 36h8M36 36h6M18 52h8M34 52h8"/>',
+ pork3:'<path class="p" d="M8 36c0-12 12-18 25-16 13 2 23 9 21 19-2 10-17 12-30 8-10-3-16-5-16-11z"/><path class="w" d="M12 34c14-4 28-4 40 2"/><path class="w" d="M14 42c12-3 24-2 34 2" /><path class="t" d="M20 28c8-3 16-3 24 0"/>',
+ slice:'<path class="p" d="M8 22c10-8 16 6 26-2s14 4 22-2v12c-8 6-12-6-22 2s-16-6-26 2z"/><path class="p" d="M8 42c10-8 16 6 26-2s14 4 22-2v12c-8 6-12-6-22 2s-16-6-26 2z"/><path class="t" d="M14 28c4-2 8 2 12 0M14 48c4-2 8 2 12 0"/>',
+ quail:'<path class="w" d="M16 26c-8 12-6 28 6 28s14-14 6-28c-2-4-10-4-12 0z"/><path class="w" d="M40 22c-8 12-6 30 6 30s14-14 6-30c-2-4-10-4-12 0z"/><path class="t" d="M20 40h.1M25 46h.1M18 48h.1M45 36h.1M50 44h.1M44 46h.1M47 30h.1" style="stroke-width:3"/>',
+ ftofu:'<path class="y" d="M10 30l20-10 24 8v18L30 56 10 46z"/><path d="M10 30l20 8 24-10M30 38v18"/><path class="t" d="M18 42l6 3M36 46l8-4M40 32l5-2"/>',
+ wakame:'<path class="g" d="M10 54c-4-14 4-24 10-28 4 8 8 12 6 28z"/><path class="g" d="M26 56c-2-18 4-34 14-42 6 12 8 24 2 42z"/><path class="g" d="M44 56c0-12 4-20 10-24 2 10 0 18-4 24z"/><path class="t" d="M18 50c-2-8 0-14 4-18M34 52c-2-12 0-24 6-32"/>',
+ dish:'<ellipse class="w" cx="32" cy="38" rx="24" ry="12"/><ellipse class="y" cx="32" cy="36" rx="12" ry="6"/>',
+ cup:'<path class="w" d="M18 20h28l-4 34H22z"/><path class="p" d="M20 30h24l-2 14H22z"/><path d="M34 20l6-12h8"/>',
+ rice:BOWL+'<path class="w" d="M13 30c1-14 10-19 19-19s18 5 19 19"/>'
+};
+const NAMEIC=[["เรือหมู","pork"],["เย็นตาโฟ","soup"],["น้ำใส","bowl"],["น้ำตก","nt"],["ต้มยำ","tom"],["เกี๊ยว","gyoza"],["มาม่าเกาหลี","packetk"],["มาม่า","packet"],["กึ่งสำเร็จรูป","packet"],["วุ้นเส้น","thin"],["หมี่ขาว","thin"],["อุด้ง","udon"],["เต้าหู้ทอด","ftofu"],["เต้าหู้","tofu"],["ผัก","veg"],["สามชั้น","pork3"],["สไลด์","slice"],["หมูสด","meat"],["ไข่นกกระทา","quail"],["ต็อก","tteok"],["วากาเมะ","wakame"],["ไก่","chicken"],["ลูกชิ้น","balls"],["ไส้กรอก","sausage"],["ราดข้าว","plate"],["น้ำ","cup"],["กาแฟ","cup"],["ชานม","cup"],["ข้าว","rice"]];
+const FACE={bowl:[32,43,.9],pork:[32,43,.9],soup:[32,43,.9],tom:[32,43,.9],nt:[32,43,.9],udon:[32,43,.9],thin:[32,43,.9],gyoza:[32,37,.9],packet:[32,31,1],packetk:[28,30,.9],tofu:[24,44,.6],veg:[32,22,.8],meat:[32,32,.9],chicken:[38,24,.8],balls:[34,30,.5],sausage:[30,32,.8],plate:[32,31,.8],tteok:[32,36,.8],pork3:[32,32,.9],slice:[32,32,.8],quail:[46,40,.6],ftofu:[30,42,.7],wakame:[40,40,.6],dish:[32,37,.8],cup:[32,44,.7],rice:[32,43,.9]};
+const fc=f=>f?`<g transform="translate(${f[0]} ${f[1]}) scale(${f[2]})"><ellipse class="k" cx="-9" cy="4" rx="3" ry="2"/><ellipse class="k" cx="9" cy="4" rx="3" ry="2"/><circle class="e" cx="-5" cy="0" r="2.4"/><circle class="e" cx="5" cy="0" r="2.4"/><path d="M-3 3.5q3 3.4 6 0" style="stroke-width:2.2"/></g>`:"";
+const ico=(n,sm,key)=>{const k=key&&IC[key]?key:(NAMEIC.find(x=>String(n).includes(x[0]))||[0,"bowl"])[1];return `<span class="ic${sm?" sm":""}" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><g>${IC[k]}</g>${fc(FACE[k])}</svg></span>`};
+const STAT=["รอคิว","กำลังทำ","พร้อมรับ","รับแล้ว"];
+let S={view:"order",menu:null,slots:[],av:[],stall:-1,cart:[],base:"ข้าว",pick:[],slot:null,err:"",name:"",mine:[],board:[],me:null,sel:-1,aerr:"",chg:false,sub:"orders",at:[],ai:[],asl:[],nm:{},plate:"จานธรรมดา",q:"",aq:"",af:"all",reg:false,rf:{name:"",letter:"",desc:"",pw:"",pw2:"",invite:""}};
+async function api(p,body,method){const r=await fetch("/api"+p,{method:method||(body?"POST":"GET"),headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"เกิดข้อผิดพลาด ลองใหม่อีกครั้ง");return d}
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2600)}
+const tk={get(){try{return JSON.parse(localStorage.getItem("tk")||"[]")}catch(e){return[]}},add(a){try{localStorage.setItem("tk",JSON.stringify(a.concat(this.get()).slice(0,30)))}catch(e){}}};
+async function refresh(keep){
+ if(!keep)S.err="";
+ try{
+  if(S.view=="order"||!S.menu||(S.view=="admin"&&!S.me)){S.menu=await api("/menu");const s=await api("/slots");S.slots=s.slots;S.av=s.avail}
+  if(S.view=="mine"||S.view=="board"){const t=tk.get();S.mine=t.length?await api("/tickets?tokens="+t.join(",")):[]}
+  if(S.view=="board")S.board=await api("/board");
+  if(S.view=="admin"){try{S.me=await api("/admin/me")}catch(e){S.me=null}
+   if(S.me){S.at=await api("/admin/tickets");if(S.sub=="menu")S.ai=await api("/admin/items");if(S.sub=="slots")S.asl=await api("/admin/slots")}}
+ }catch(e){S.err=e.message}
+ render()}
+const badSlot=id=>{const ids=[...new Set(S.cart.map(c=>c.stall_id))];return ids.some(sid=>{const r=S.av.find(a=>a.slot_id==id&&a.stall_id==sid);return !r||!r.open||r.used>=r.cap})};
+const total=()=>S.cart.reduce((a,c)=>a+c.price*c.qty,0);
+const item=id=>S.menu.items.find(i=>i.id==id);
+function pick(id){if(!badSlot(id)){S.slot=id;S.err="";render()}}
+function setStall(v){S.stall=v;S.q="";render()}
+const soldCard=m=>`<div class="item off" data-n="${esc(m.name)}"><div class="e">${ico(m.name,0,m.icon)}</div><b>${esc(m.name)}</b><small>หมดแล้ว</small><div class="row"><b class="pr">${baht(m.price)}</b><button class="btn" disabled>หมด</button></div></div>`;
+function applySearch(){const t=(($("#q")||{}).value||"").trim().toLowerCase();let any=0,shown=0;document.querySelectorAll("#app .menu .item").forEach(e=>{any++;const ok=!t||(e.dataset.n||"").toLowerCase().includes(t);e.style.display=ok?"":"none";if(ok)shown++});const n=$("#nores");if(n)n.style.display=any&&!shown?"":"none"}
+function addItem(id){const it=item(id),c=S.cart.find(c=>c.item_id==id&&!c.base);if(c)c.qty++;else S.cart.push({item_id:id,stall_id:it.stall_id,name:it.name,price:it.price,qty:1});S.err="";render()}
+function togDish(id){const i=S.pick.indexOf(id);if(i>=0)S.pick.splice(i,1);else if(S.pick.length<2)S.pick.push(id);else toast("เลือกได้ 2 อย่างต่อจาน เอาอันเดิมออกก่อน");render()}
+function addPlate(id){if(S.pick.length!=2)return toast("เลือกกับข้าวให้ครบ 2 อย่างก่อน");const it=item(id),dishes=[...S.pick].sort((a,b)=>a-b),detail=dishes.map(d=>item(d).name).join(" + ")+" · "+S.plate;
+ const c=S.cart.find(c=>c.item_id==id&&c.base==S.base&&c.detail==detail);if(c)c.qty++;else S.cart.push({item_id:id,stall_id:it.stall_id,name:it.name,price:it.price,qty:1,base:S.base,dishes,detail,plate:S.plate});S.pick=[];S.err="";render()}
+function togBroth(id){const it=item(id),had=S.cart.some(c=>c.item_id==id);S.cart=S.cart.filter(c=>item(c.item_id).kind!="broth"||item(c.item_id).stall_id!=it.stall_id);if(!had)S.cart.push({item_id:id,stall_id:it.stall_id,name:it.name,price:it.price,qty:1});S.err="";render()}
+function chg(i,d){if(d>0&&item(S.cart[i].item_id).kind=="broth")return;S.cart[i].qty+=d;if(S.cart[i].qty<=0)S.cart.splice(i,1);S.err="";render()}
+async function place(){
+ if(!S.cart.length)S.err="ยังไม่มีรายการ เลือกเมนูก่อนสั่ง";
+ else if(S.slot===null)S.err="เลือกรอบรับอาหารด้านบนก่อน";
+ else if(!S.name.trim())S.err="กรอกชื่อก่อนสั่ง";
+ else{try{const r=await api("/orders",{name:S.name.trim(),slot_id:S.slot,lines:S.cart.map(c=>({item_id:c.item_id,qty:c.qty,base:c.base,dishes:c.dishes,veg:c.veg,noodle:c.noodle,egg:c.egg,plate:c.plate}))});
+  tk.add(r.tickets.map(t=>t.token));S.cart=[];S.slot=null;S.err="";S.view="mine";toast("สั่งสำเร็จ รับบัตรคิว "+r.tickets.map(t=>t.code).join(", "));return refresh()}
+  catch(e){S.err=e.message;return refresh(true)}}
+ render()}
+const payTag=t=>t.paid?`<span class="pay ok">ชำระแล้ว (หน้าร้าน)</span>`:`<span class="pay no">ยังไม่ชำระ · จ่ายหน้าร้าน</span>`;
+const steps=t=>`<div class="st">${STAT.map((s,i)=>`<span class="${i<=t.status?"on":""}">${s}</span>`).join("")}</div>`;
+const lines=t=>t.lines.map(l=>`${esc(l.name)}${opt(l)} ×${l.qty}`).join("<br>");
+function ticketHTML(t,admin){return `<div class="ticket"><div><div class="code">${t.code}</div><div><b>${esc(t.customer)}</b></div><div class="hint">${esc(t.stall_name)}<br>รับเวลา ${t.time} น.</div></div>
+ <div style="flex:1;min-width:210px">${lines(t)}<div>รวม <b>${baht(t.total)}</b> ${payTag(t)}</div>
+ ${!admin&&t.status<2?`<div class="hint">มีคิวก่อนหน้าคุณ ${t.ahead} คิว</div>`:""}${steps(t)}</div>
+ ${admin?`<div style="display:flex;flex-direction:column;gap:6px">${t.paid?"":`<button class="btn sec" onclick="payT(${t.id})">รับเงินแล้ว</button>`}<button class="btn" ${t.status>=3?"disabled":""} onclick="advT(${t.id})">${t.status>=3?"เสร็จแล้ว":"ไปขั้น: "+STAT[t.status+1]}</button></div>`:""}</div>`}
+function chips(cur,fn,all){const L=(all?[{id:-1,name:"ทุกร้าน"}]:[]).concat(S.menu.stalls);return `<div class="chips" role="group">${L.map(s=>`<button class="chip" aria-pressed="${s.id==cur}" onclick="${fn}(${s.id})">${esc(s.name)}</button>`).join("")}</div>`}
+function plateCard(m){const D=S.menu.items.filter(i=>i.kind=="dish"&&i.stall_id==m.stall_id);
+ return `<div class="item" data-n="${esc(m.name)}" style="grid-column:1/-1"><div class="e">${ico(m.name,0,m.icon)}</div><b>${esc(m.name)}</b><small>เลือกกับข้าว 2 อย่างต่อ 1 จาน</small>
+ <div class="seg" style="margin-top:6px;align-self:flex-start">${["ข้าว","ขนมจีน"].map(x=>`<button aria-pressed="${S.base==x}" onclick="S.base='${x}';render()">${x}</button>`).join("")}</div>
+ <div class="seg" style="margin-top:6px;align-self:flex-start" role="group" aria-label="ภาชนะ">${["จานธรรมดา","จานพลาสติก"].map(x=>`<button aria-pressed="${S.plate==x}" onclick="S.plate='${x}';render()">${x}</button>`).join("")}</div>
+ <div class="chips" style="margin-top:8px">${D.map(d=>`<button class="chip" aria-pressed="${S.pick.includes(d.id)}" onclick="togDish(${d.id})" ${d.available?"":"disabled"}>${esc(d.name)}${d.available?"":" (หมด)"}</button>`).join("")}</div>
+ <div class="row"><span class="hint">เลือกแล้ว ${S.pick.length}/2</span><b class="pr">${baht(m.price)}</b><button class="btn" onclick="addPlate(${m.id})">เพิ่มลงตะกร้า</button></div></div>`}
+/*N*/const MEATS=["หมูตุ๋น","หมูชิ้น","ไก่","หมูสับ"],NOODLES=["บะหมี่","เส้นเล็ก","เส้นใหญ่","เส้นหมี่","ไวไว"];
+const opt=l=>l.base?` (${esc(l.base)}${l.detail.includes(" · ")?" · ":": "}${esc(l.detail)})`:"";
+const nmOf=id=>S.nm[id]||(S.nm[id]={meat:0,noodle:1,egg:false,veg:true});
+function setNoodle(id,i){nmOf(id).noodle=i;render()}
+const isTY=m=>String(m.name).includes("ต้มยำ");
+function setEgg(id,v){nmOf(id).egg=v;render()}
+function setMeat(id,i){nmOf(id).meat=i;render()}
+function setVeg(id,v){nmOf(id).veg=v;render()}
+function addNoodle(id){const it=item(id),o=nmOf(id),base=MEATS[o.meat],nd=NOODLES[o.noodle],egg=isTY(it)?o.egg:undefined,detail=[nd].concat(isTY(it)?[o.egg?"ใส่ไข่":"ไม่ใส่ไข่"]:[],[o.veg?"ใส่ผัก":"ไม่ใส่ผัก"]).join(" · ");
+ const c=S.cart.find(c=>c.item_id==id&&c.base==base&&c.detail==detail);if(c)c.qty++;else S.cart.push({item_id:id,stall_id:it.stall_id,name:it.name,price:it.price,qty:1,base,detail,veg:o.veg,noodle:nd,egg});S.err="";render()}
+function noodleCard(m){const o=nmOf(m.id);
+ return `<div class="item" data-n="${esc(m.name)}" style="grid-column:1/-1"><div class="e">${ico(m.name,0,m.icon)}</div><b>${esc(m.name)}</b><small>เลือกเส้น เนื้อสัตว์ และผัก</small>
+ <div class="chips" style="margin-top:8px" role="group" aria-label="เส้น">${NOODLES.map((x,i)=>`<button class="chip" aria-pressed="${o.noodle==i}" onclick="setNoodle(${m.id},${i})">${x}</button>`).join("")}</div>
+ <div class="chips" style="margin-top:8px" role="group" aria-label="เนื้อสัตว์">${MEATS.map((x,i)=>`<button class="chip" aria-pressed="${o.meat==i}" onclick="setMeat(${m.id},${i})">${x}</button>`).join("")}</div>
+ ${isTY(m)?`<div class="seg" style="margin-top:8px;align-self:flex-start">${[[true,"ใส่ไข่"],[false,"ไม่ใส่ไข่"]].map(x=>`<button aria-pressed="${o.egg===x[0]}" onclick="setEgg(${m.id},${x[0]})">${x[1]}</button>`).join("")}</div>`:""}
+ <div class="seg" style="margin-top:8px;align-self:flex-start">${[[true,"ใส่ผัก"],[false,"ไม่ใส่ผัก"]].map(x=>`<button aria-pressed="${o.veg===x[0]}" onclick="setVeg(${m.id},${x[0]})">${x[1]}</button>`).join("")}</div>
+ <div class="row"><span class="hint">${NOODLES[o.noodle]} · ${MEATS[o.meat]} · ${isTY(m)?(o.egg?"ใส่ไข่":"ไม่ใส่ไข่")+" · ":""}${o.veg?"ใส่ผัก":"ไม่ใส่ผัก"}</span><b class="pr">${baht(m.price)}</b><button class="btn" onclick="addNoodle(${m.id})">เพิ่มลงตะกร้า</button></div></div>`}
+const fail=m=>{S.aerr=m;render()};
+function selStall(i){S.sel=i;S.aerr="";render()}
+async function login(){const f=!S.menu.stalls.find(s=>s.id==S.sel).has_pw,v=$("#apw").value;
+ if(f){if(v.length<4)return fail("รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร");if(v!==$("#apw2").value)return fail("รหัสผ่านสองช่องไม่ตรงกัน")}
+ try{await api("/admin/login",{stall_id:S.sel,password:v});S.aerr="";S.sub="orders";S.menu=null;await refresh()}catch(e){fail(e.message)}}
+async function logout(){try{await api("/admin/logout",{})}catch(e){}S.me=null;S.sel=-1;S.chg=false;S.reg=false;S.aerr="";refresh()}
+async function chgpw(){try{await api("/admin/password",{password:$("#npw").value});S.chg=false;S.aerr="";toast("เปลี่ยนรหัสผ่านแล้ว");render()}catch(e){fail(e.message)}}
+async function advT(id){try{await api(`/admin/tickets/${id}/advance`,{})}catch(e){toast(e.message)}refresh()}
+async function payT(id){try{await api(`/admin/tickets/${id}/pay`,{})}catch(e){toast(e.message)}refresh()}
+const KINDS=[["normal","เมนูทั่วไป"],["noodle","ก๋วยเตี๋ยว"],["plate","ราดข้าว"],["dish","กับข้าว"],["broth","น้ำซุป"]];
+const ICONS=[["","อัตโนมัติตามชื่อ"],["bowl","ชามก๋วยเตี๋ยว"],["pork","เรือหมู"],["soup","เย็นตาโฟ"],["tom","ต้มยำ"],["gyoza","เกี๊ยว"],["packet","มาม่า"],["thin","วุ้นเส้น"],["udon","อุด้ง"],["tofu","เต้าหู้"],["veg","ผัก"],["meat","เนื้อ"],["chicken","ไก่"],["balls","ลูกชิ้น"],["sausage","ไส้กรอก"],["plate","จานข้าว"],["rice","ข้าวสวย"],["tteok","ต็อก"],["pork3","หมูสามชั้น"],["slice","หมูสไลด์"],["quail","ไข่"],["ftofu","เต้าหู้ทอด"],["wakame","สาหร่าย"],["cup","เครื่องดื่ม"],["dish","จานกับข้าว"]];
+const opts=(L,cur)=>L.map(x=>`<option value="${x[0]}" ${x[0]==cur?"selected":""}>${x[1]}</option>`).join("");
+async function reloadItems(){S.ai=await api("/admin/items")}
+async function saveItem(id){const p=$("#p"+id).value;if(p==="")return toast("กรอกราคาก่อน");
+ try{await api("/admin/items/"+id,{name:$("#n"+id).value,price:+p,kind:$("#k"+id).value,icon:$("#i"+id).value,available:(S.ai.find(x=>x.id==id)||{}).available!==false},"PUT");await reloadItems();toast("บันทึกแล้ว")}catch(e){toast(e.message)}}
+async function addNewItem(){const p=$("#ni_p").value;if(!$("#ni_n").value.trim())return toast("กรอกชื่อเมนูก่อน");if(p==="")return toast("กรอกราคาก่อน");
+ try{await api("/admin/items",{name:$("#ni_n").value,price:+p,kind:$("#ni_k").value,icon:$("#ni_i").value,available:true});await reloadItems();render();toast("เพิ่มเมนูแล้ว")}catch(e){toast(e.message)}}
+async function delItem(id){const n=($("#n"+id)||{}).value||"";if(!confirm("ลบเมนู “"+n+"” ออกจากร้าน? (ถ้าแค่ของหมด ให้ติ๊กเอา “ขาย” ออกแทน)"))return;
+ try{await api("/admin/items/"+id,null,"DELETE");await reloadItems();render();toast("ลบเมนูแล้ว")}catch(e){toast(e.message)}}
+async function saveShop(){try{await api("/admin/stall",{name:$("#sn").value,letter:$("#sl").value,description:$("#sd").value},"PUT");S.aerr="";toast("บันทึกข้อมูลร้านแล้ว");await refresh()}catch(e){toast(e.message)}}
+async function register(){const r=S.rf;if(r.pw.length<4)return fail("รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร");if(r.pw!==r.pw2)return fail("รหัสผ่านสองช่องไม่ตรงกัน");
+ try{await api("/stalls",{name:r.name,letter:r.letter,description:r.desc,password:r.pw,invite:r.invite});
+  S.rf={name:"",letter:"",desc:"",pw:"",pw2:"",invite:""};S.reg=false;S.aerr="";S.sub="menu";S.menu=null;toast("เปิดร้านแล้ว เริ่มเพิ่มเมนูของร้านได้เลย");await refresh()}catch(e){fail(e.message)}}
+function regHTML(){const r=S.rf,f=(k,l,t,ex)=>`<label for="r_${k}">${l}</label><input id="r_${k}" type="${t||"text"}" value="${esc(r[k])}" ${ex||""} autocomplete="off" oninput="S.rf.${k}=this.value">`;
+ return `<h2>ลงทะเบียนร้านใหม่</h2><div class="bc" style="max-width:420px"><p class="hint">กรอกข้อมูลร้าน ระบบจะเข้าสู่ระบบแอดมินของร้านให้ทันที แล้วเพิ่มเมนูได้เลย</p>
+ ${f("name","ชื่อร้าน","text",'maxlength="40"')}${f("letter","ตัวอักษรหน้าเลขบัตรคิว (1 ตัว เช่น ก, A)","text",'maxlength="2" style="width:80px"')}${f("desc","คำอธิบายร้าน (ไม่บังคับ)","text",'maxlength="120"')}
+ ${f("pw","ตั้งรหัสผ่านของร้าน (อย่างน้อย 4 ตัว)","password")}${f("pw2","ยืนยันรหัสผ่าน","password")}${S.menu.invite_required?f("invite","รหัสเชิญจากผู้ดูแลโรงอาหาร","password"):""}
+ <div class="err" role="alert">${esc(S.aerr)}</div><div style="display:flex;gap:8px"><button class="btn" onclick="register()">เปิดร้าน</button><button class="btn sec" onclick="S.reg=false;S.aerr='';render()">ยกเลิก</button></div></div>`}
+const itemRow=i=>`<div class="bc ed${i.available?"":" off"}" id="row${i.id}" data-n="${esc(i.name)}" data-av="${i.available?1:0}" style="margin-bottom:8px"><span>${ico(i.name,1,i.icon)}</span><input id="n${i.id}" value="${esc(i.name)}" maxlength="60" aria-label="ชื่อเมนู" style="flex:1;min-width:140px">
+ <b id="s${i.id}" style="color:var(--danger);${i.available?"display:none":""}">หมด</b><input id="p${i.id}" type="number" min="0" max="1000" value="${i.price}" style="width:80px" aria-label="ราคา ${esc(i.name)}"><select id="k${i.id}" aria-label="ประเภท">${opts(KINDS,i.kind)}</select><select id="i${i.id}" aria-label="ไอคอน">${opts(ICONS,i.icon)}</select>
+ <button class="btn${i.available?" sec":""}" id="t${i.id}" onclick="toggleSold(${i.id})">${i.available?"ของหมด":"เปิดขายอีกครั้ง"}</button><button class="btn sec" onclick="saveItem(${i.id})">บันทึก</button><button class="btn sec del" onclick="delItem(${i.id})">ลบ</button></div>`;
+async function toggleSold(id){const it=S.ai.find(x=>x.id==id);if(!it)return;const nv=!it.available;
+ try{await api("/admin/items/"+id,{available:nv},"PUT");it.available=nv;const r=$("#row"+id);r.classList.toggle("off",!nv);r.dataset.av=nv?1:0;const t=$("#t"+id);t.textContent=nv?"ของหมด":"เปิดขายอีกครั้ง";t.classList.toggle("sec",nv);$("#s"+id).style.display=nv?"none":"";
+  toast(nv?"เปิดขาย “"+it.name+"” อีกครั้งแล้ว":"ปิดเมนู “"+it.name+"” (หมด) แล้ว ลูกค้าจะเห็นว่าหมด");applyAdminFilter()}catch(e){toast(e.message)}}
+function applyAdminFilter(){const rows=[...document.querySelectorAll("#app [data-av]")];if(!rows.length)return;const t=(S.aq||"").trim().toLowerCase(),c={all:0,in:0,out:0};
+ rows.forEach(r=>{const av=r.dataset.av=="1";c.all++;av?c.in++:c.out++;r.style.display=(!t||r.dataset.n.toLowerCase().includes(t))&&(S.af=="all"||(S.af=="in")==av)?"":"none"});
+ [["all","ทั้งหมด"],["in","มีขาย"],["out","หมด"]].forEach(x=>{const e=$("#af_"+x[0]);if(e){e.textContent=x[1]+" "+c[x[0]];e.setAttribute("aria-pressed",S.af==x[0])}})}
+function setAF(v){S.af=v;applyAdminFilter()}
+function menuAdminHTML(){const on=k=>S.ai.filter(i=>i.kind==k&&i.available).length,w=on("plate")&&on("dish")<2?`<div class="warn">ร้านมีเมนู “ราดข้าว” แต่มีกับข้าวที่เปิดขายไม่ถึง 2 อย่าง ลูกค้าจะสั่งราดข้าวไม่ได้ เพิ่มเมนูประเภท “กับข้าว” ก่อนนะ</div>`:"";
+ return `<p class="hint">ของหมดกด “ของหมด” ได้ทันที (มีผลเลย ลูกค้าจะเห็นเมนูนั้นเป็น “หมด” และสั่งไม่ได้) พอมีของกด “เปิดขายอีกครั้ง” ส่วนชื่อ ราคา ประเภท ไอคอน แก้แล้วกด “บันทึก” ของแถวนั้น</p>
+ <div class="ed" style="margin:8px 0"><input id="aq" type="search" placeholder="ค้นหาเมนูของร้านคุณ" value="${esc(S.aq)}" oninput="S.aq=this.value;applyAdminFilter()" style="flex:1;min-width:160px" aria-label="ค้นหาเมนูของร้านคุณ" autocomplete="off"><div class="chips" role="group" aria-label="กรองเมนู">${["all","in","out"].map(k=>`<button class="chip" id="af_${k}" aria-pressed="${S.af==k}" onclick="setAF('${k}')">${k}</button>`).join("")}</div></div>
+ <div class="bc" style="margin:8px 0 14px"><h3 style="font-size:17px;margin-bottom:8px">เพิ่มเมนูใหม่</h3><div class="ed"><input id="ni_n" placeholder="ชื่อเมนู" maxlength="60" aria-label="ชื่อเมนูใหม่" style="flex:1;min-width:140px"><input id="ni_p" type="number" min="0" max="1000" placeholder="ราคา" style="width:90px" aria-label="ราคาเมนูใหม่">
+ <select id="ni_k" aria-label="ประเภทเมนูใหม่">${opts(KINDS,"normal")}</select><select id="ni_i" aria-label="ไอคอนเมนูใหม่">${opts(ICONS,"")}</select><button class="btn" onclick="addNewItem()">+ เพิ่มเมนู</button></div>
+ <p class="hint" style="margin:8px 0 0"><b>ประเภท:</b> เมนูทั่วไป = ราคาเดียว กดเพิ่มลงตะกร้า · ก๋วยเตี๋ยว = ลูกค้าเลือกเส้น เนื้อ ผัก · ราดข้าว = ลูกค้าเลือกกับข้าว 2 อย่าง · กับข้าว = ตัวเลือกของราดข้าว (ไม่คิดราคา) · น้ำซุป = เลือกได้ 1 อย่าง (ไม่คิดราคา)</p></div>${w}`+(S.ai.length?S.ai.map(itemRow).join(""):`<div class="empty">ร้านนี้ยังไม่มีเมนู เพิ่มเมนูแรกได้ที่ช่องด้านบน</div>`)}
+function shopHTML(){const m=S.me;return `<p class="hint">ชื่อและคำอธิบายนี้แสดงให้ลูกค้าเห็นในหน้าสั่งอาหาร</p><div class="bc" style="max-width:420px"><label for="sn">ชื่อร้าน</label><input id="sn" value="${esc(m.name)}" maxlength="40">
+ <label for="sl">ตัวอักษรหน้าเลขบัตรคิว</label><input id="sl" value="${esc(m.letter)}" maxlength="2" style="width:80px"><label for="sd">คำอธิบายร้าน</label><input id="sd" value="${esc(m.description||"")}" maxlength="120">
+ <div style="margin-top:12px"><button class="btn" onclick="saveShop()">บันทึกข้อมูลร้าน</button></div></div>`}
+async function saveSlot(id){try{await api("/admin/slots/"+id,{cap:+$("#c"+id).value,open:$("#o"+id).checked},"PUT");toast("บันทึกแล้ว")}catch(e){toast(e.message)}}
+function setSub(v){S.sub=v;refresh()}
+function loginHTML(){return S.reg?regHTML():loginHTML0()+`<div style="margin-top:16px"><p class="hint">เป็นร้านใหม่ที่ยังไม่มีในระบบ?</p><button class="btn sec" onclick="S.reg=true;S.aerr='';render()">+ ลงทะเบียนร้านใหม่</button></div>`}
+function loginHTML0(){const i=S.sel;let h=`<h2>แอดมิน: เลือกร้านของคุณ</h2>`+chips(i,"selStall",false);
+ if(i<0)return h+`<div class="empty">เลือกร้านเพื่อเข้าสู่ระบบ แต่ละร้านจะเห็นเฉพาะออเดอร์ของร้านตัวเอง</div>`;
+ const st=S.menu.stalls.find(s=>s.id==i),f=!st.has_pw;
+ return h+`<div class="bc" style="max-width:380px"><h3>${esc(st.name)}</h3><p class="hint">${f?"ร้านนี้ยังไม่มีรหัสผ่าน ตั้งรหัสของร้านเพื่อเริ่มใช้งาน (อย่างน้อย 4 ตัวอักษร)":"ใส่รหัสผ่านของร้านนี้"}</p>
+ <label for="apw">${f?"ตั้งรหัสผ่าน":"รหัสผ่าน"}</label><input id="apw" type="password" autocomplete="off" onkeydown="if(event.key=='Enter')login()">
+ ${f?`<label for="apw2">ยืนยันรหัสผ่าน</label><input id="apw2" type="password" autocomplete="off" onkeydown="if(event.key=='Enter')login()">`:""}
+ <div class="err" role="alert">${S.aerr}</div><button class="btn" style="width:100%" onclick="login()">${f?"ตั้งรหัสและเข้าสู่ระบบ":"เข้าสู่ระบบ"}</button></div>`}
+function adminHTML(){
+ const act=S.at.filter(t=>t.status<3).length,sum=S.at.filter(t=>t.paid).reduce((a,t)=>a+t.total,0);
+ let h=`<h2>แอดมิน: ${esc(S.me.name)}</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button class="btn sec" onclick="S.chg=!S.chg;S.aerr='';render()">เปลี่ยนรหัสผ่าน</button><button class="btn sec" onclick="logout()">ออกจากระบบ</button></div>`;
+ if(S.chg)h+=`<div class="bc" style="max-width:380px;margin-bottom:12px"><label for="npw">รหัสผ่านใหม่</label><input id="npw" type="password" autocomplete="off"><div class="err" role="alert">${S.aerr}</div><button class="btn" onclick="chgpw()">บันทึกรหัสผ่านใหม่</button></div>`;
+ h+=`<div class="chips" role="group">${[["orders","ออเดอร์วันนี้"],["menu","เมนูและราคา"],["slots","รอบรับอาหาร"],["shop","ข้อมูลร้าน"]].map(x=>`<button class="chip" aria-pressed="${S.sub==x[0]}" onclick="setSub('${x[0]}')">${x[1]}</button>`).join("")}</div>`;
+ if(S.sub=="orders")return h+`<p class="hint">วันนี้ค้างอยู่ ${act} ใบ · รับเงินแล้ว ${baht(sum)} · หน้านี้อัปเดตเองทุก 5 วินาที</p>`+(S.at.length?S.at.map(t=>ticketHTML(t,true)).join(""):`<div class="empty">ยังไม่มีออเดอร์วันนี้</div>`);
+ const sx=`style="width:auto"`;
+ if(S.sub=="menu")return h+menuAdminHTML();
+ if(S.sub=="shop")return h+shopHTML();
+ return h+`<p class="hint">จำนวนคิวสูงสุดต่อรอบของร้านคุณ และปิดรอบที่ไม่รับออเดอร์ได้</p>`+S.asl.map(s=>`<div class="line"><b>${s.time} น.</b><span><input id="c${s.slot_id}" type="number" min="0" max="100" value="${s.cap}" style="width:80px" aria-label="จำนวนคิว ${s.time}"> <label style="display:inline"><input id="o${s.slot_id}" type="checkbox" ${sx} ${s.open?"checked":""}> เปิดรับ</label> <button class="btn sec" onclick="saveSlot(${s.slot_id})">บันทึก</button></span></div>`).join("")}
+function render(){
+ document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v==S.view));
+ $("#cnt").textContent=S.mine.length?`(${S.mine.length})`:"";
+ const a=$("#app");
+ if(!S.menu){a.innerHTML=S.err?`<div class="err">${esc(S.err)}</div>`:`<div class="empty">กำลังโหลด...</div>`;return}
+ $("#hd").textContent=`เลือกเมนูจาก ${S.menu.stalls.length} ร้านในโรงอาหาร${S.slots.length?" เลือกรอบรับ "+S.slots.map(x=>x.time).join(", ")+" ":" "}แล้วรับบัตรคิวของแต่ละร้าน`;
+ const E=S.err&&S.view!="order"?`<div class="err" role="alert">${esc(S.err)}</div>`:"";
+ if(S.view=="mine"){a.innerHTML=E+`<h2>บัตรคิวของฉัน</h2><p class="hint">ร้านละ 1 บัตร แสดงบัตรนี้ที่หน้าร้านเมื่อถึงเวลารับ (แสดงเฉพาะของวันนี้ หน้านี้อัปเดตเองทุก 5 วินาที)</p>`+(S.mine.length?S.mine.map(t=>ticketHTML(t,false)).join(""):`<div class="empty">ยังไม่มีบัตรคิวของวันนี้ ไปที่แท็บ “สั่งอาหาร” เพื่อเริ่มสั่ง</div>`);return}
+ if(S.view=="board"){const mine=new Set(S.mine.map(t=>t.code));
+  a.innerHTML=E+`<h2>คิวของแต่ละร้านตอนนี้</h2><p class="hint">คิวสีแดงคือบัตรของคุณ</p><div class="board">`+S.board.map(s=>{
+  const g=st=>s.tickets.filter(t=>t.status==st).map(t=>`<span class="q ${mine.has(t.code)?"me":""}">${t.code} <small style="font:400 14px Sarabun,sans-serif">${esc(t.customer)}</small></span>`).join("")||`<span class="hint">ไม่มี</span>`;
+  return `<div class="bc"><h3>${esc(s.name)}</h3><div class="g"><small>พร้อมรับ มารับได้เลย</small>${g(2)}</div><div class="g"><small>กำลังทำ</small>${g(1)}</div><div class="g"><small>รอคิว</small>${g(0)}</div></div>`}).join("")+`</div>`;return}
+ if(S.view=="admin"){a.innerHTML=E+(S.me?adminHTML():loginHTML());applyAdminFilter();return}
+ if(S.slot!==null&&badSlot(S.slot))S.slot=null;
+ if(S.stall<0)S.stall=S.menu.stalls[0].id;
+ const items=S.menu.items.filter(i=>i.kind!="dish"&&i.kind!="broth"&&(S.stall<0||i.stall_id==S.stall)).sort((a,b)=>(b.available?1:0)-(a.available?1:0)),L=id=>S.menu.stalls.find(s=>s.id==id);
+ a.innerHTML=`<h2>1. เลือกรอบรับอาหาร</h2>
+ <div class="slots" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${S.slots.map(sl=>{const bad=badSlot(sl.id),rows=S.av.filter(x=>x.slot_id==sl.id);return `<button class="slot ${bad?"full":""}" aria-pressed="${S.slot===sl.id}" onclick="pick(${sl.id})" ${bad?"disabled":""}><b>${sl.time} น.</b><small>คิวว่าง ${rows.map(r=>L(r.stall_id).letter+" "+(r.open?Math.max(r.cap-r.used,0):"ปิด")).join(" · ")}</small></button>`}).join("")}</div>
+ 
+ <div class="layout"><section><h2>2. เลือกร้าน</h2>${chips(S.stall,"setStall",false)}
+ ${S.stall>=0&&L(S.stall).description?`<div class="sd">${esc(L(S.stall).description)}</div>`:""}
+ ${(()=>{const B=S.menu.items.filter(i=>i.kind=="broth"&&i.stall_id==S.stall);return B.length?`<div class="sd" style="margin-top:12px"><b>น้ำ</b> เลือกได้ 1 อย่าง</div><div class="chips" role="group" aria-label="น้ำ">${B.map(i=>`<button class="chip" aria-pressed="${S.cart.some(c=>c.item_id==i.id)}" onclick="togBroth(${i.id})" ${i.available?"":"disabled"}>${esc(i.name)}${i.available?"":" (หมด)"}</button>`).join("")}</div>`:""})()}
+ ${items.length>6?`<div class="search"><input id="q" type="search" placeholder="ค้นหาเมนูในร้านนี้ เช่น กุ้ง เห็ด หมู" value="${esc(S.q)}" oninput="S.q=this.value;applySearch()" aria-label="ค้นหาเมนู" autocomplete="off"></div>`:""}
+ <div class="menu">${items.map(m=>{if(!m.available)return soldCard(m);if(m.kind=="plate")return plateCard(m);if(m.kind=="noodle")return noodleCard(m);const n=S.cart.filter(c=>c.item_id==m.id).reduce((x,c)=>x+c.qty,0);
+ return `<div class="item" data-n="${esc(m.name)}"><div class="e">${ico(m.name,0,m.icon)}</div><b>${esc(m.name)}</b><small>${esc(L(m.stall_id).name)}</small>
+ <div class="row"><b class="pr">${baht(m.price)}</b><button class="btn" onclick="addItem(${m.id})">เพิ่ม${n?" ("+n+")":""}</button></div></div>`}).join("")||`<div class="empty">ร้านนี้ยังไม่มีเมนู</div>`}</div><div id="nores" class="empty" style="display:none">ไม่พบเมนูที่ค้นหา ลองพิมพ์คำอื่น</div></section>
+ <aside class="cart"><h2>3. ตะกร้าและยืนยัน</h2>
+ ${S.cart.length?S.cart.map((c,i)=>`<div class="line"><span>${esc(c.name)}${opt(c)}</span><span class="qty"><button aria-label="ลด" onclick="chg(${i},-1)">−</button><b>${c.qty}</b><button aria-label="เพิ่ม" onclick="chg(${i},1)">+</button></span><b>${baht(c.price*c.qty)}</b></div>`).join(""):`<div class="hint">ตะกร้าว่าง เลือกเมนูทางซ้ายเพื่อเริ่ม</div>`}
+ <div class="tot"><span>รวม</span><span>${baht(total())}</span></div>
+ <div class="hint">รอบรับ: ${S.slot===null?"ยังไม่เลือก":S.slots.find(x=>x.id==S.slot).time+" น."} · สั่งหลายร้านจะได้บัตรคิวแยกร้าน</div>
+ <label for="nm">ชื่อ</label><input id="nm" value="${esc(S.name)}" autocomplete="name" maxlength="60" oninput="S.name=this.value">
+ <div class="hint" style="margin-top:10px">ชำระเงินที่หน้าร้านตอนรับอาหาร</div>
+ <div class="err" role="alert">${esc(S.err)}</div>
+ <button class="btn" style="width:100%" onclick="place()">ยืนยันสั่งอาหาร</button></aside></div>`;applySearch();
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{S.view=b.dataset.v;S.err="";refresh()});
+setInterval(()=>{if(document.hidden)return;if(S.view=="mine"||S.view=="board"||(S.view=="admin"&&S.me&&S.sub=="orders"))refresh(true)},5000);
+refresh();
+</script>
+</body>
+</html>
